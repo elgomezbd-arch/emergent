@@ -1,22 +1,18 @@
-FROM node:18-alpine
+FROM node:18-bullseye
 
-# Create working directory inside container
+# Install system build tools required for some NPM packages
+RUN apt-get update && apt-get install -y python3 make g++ && apt-get clean
+
 WORKDIR /app
 
-# Copy package files first (better caching)
 COPY package*.json ./
 
-# Install dependencies
 RUN npm install
 
-# Copy everything else
 COPY . .
 
-# Build the Emergent project
 RUN npm run build
 
-# Expose the dev server port
 EXPOSE 5173
 
-# Start Emergent
 CMD ["npm", "run", "dev", "--", "--host"]
